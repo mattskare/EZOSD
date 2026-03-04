@@ -253,19 +253,19 @@ function Start-Deployment {
 
         #region Temp
         # Temporarily copy module files to Windows partition for post-install script access
-        $postInstallModulePath = Join-Path ${windowsDrive}":" "EZOSD\Modules"
-        try {
-            if (-not (Test-Path $postInstallModulePath)) {
-                New-Item -Path $postInstallModulePath -ItemType Directory -ErrorAction Stop | Out-Null
-            }
-            Get-ChildItem -Path $modulePath\*.psm1 -ErrorAction Stop | ForEach-Object {
-                Copy-Item -Path $_.FullName -Destination $postInstallModulePath -ErrorAction Stop
-            }
-            Write-Host "  ✓ Module files copied to Windows partition for post-install script access" -ForegroundColor Green
-        }
-        catch {
-            Write-Warning "Failed to copy module files to Windows partition: $_"
-        }
+        # $postInstallModulePath = Join-Path ${windowsDrive}":" "EZOSD\Modules"
+        # try {
+        #     if (-not (Test-Path $postInstallModulePath)) {
+        #         New-Item -Path $postInstallModulePath -ItemType Directory -ErrorAction Stop | Out-Null
+        #     }
+        #     Get-ChildItem -Path $modulePath\*.psm1 -ErrorAction Stop | ForEach-Object {
+        #         Copy-Item -Path $_.FullName -Destination $postInstallModulePath -ErrorAction Stop
+        #     }
+        #     Write-Host "  ✓ Module files copied to Windows partition for post-install script access" -ForegroundColor Green
+        # }
+        # catch {
+        #     Write-Warning "Failed to copy module files to Windows partition: $_"
+        # }
         #endregion Temp
         
         Write-Host ""

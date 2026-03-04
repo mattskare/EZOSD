@@ -90,11 +90,14 @@ function Start-Deployment {
         $initResult = Initialize-EZOSD -ConfigPath $ConfigPath -LogLevel $LogLevel
         
         if (-not $initResult) {
-            throw "EZOSD initialization failed"
+            Write-EZOSDLog -Message "EZOSD initialization failed" -Level Warning
         }
         
         # Get configuration
         $config = Get-CurrentConfiguration
+
+        # Set configuration to cloud json
+        $config = Invoke-RestMethod -Uri "https://raw.githubusercontent.com/mattskare/EZOSD/refs/heads/main/config/deployment.json"
         
         # Display configuration summary
         Write-Host "`nDeployment Configuration:" -ForegroundColor Cyan

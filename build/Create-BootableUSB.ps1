@@ -245,6 +245,10 @@ function Add-WinPEPackages {
     Creates startnet.cmd for auto-launching EZOSD.
 #>
 function New-StartNetCmd {
+    param(
+        [string]$Architecture
+    )
+
     Write-Log "Creating startnet.cmd..."
     
     $startNetPath = Join-Path "$script:WorkingDirectory\WinPE_$Architecture\mount" "Windows\System32\startnet.cmd"
@@ -409,7 +413,7 @@ function Start-Build {
                 Add-WinPEPackages -ADKPath $ADKPath -Architecture $architecture
 
                 # Create startnet.cmd
-                New-StartNetCmd
+                New-StartNetCmd -Architecture $architecture
 
                 # Unmount image
                 Dismount-WinPEImage -Architecture $architecture

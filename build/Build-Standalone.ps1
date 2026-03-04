@@ -254,5 +254,5 @@ Write-Host "Output: $outputFile" -ForegroundColor White
 Write-Host "Size: $outputSize KB" -ForegroundColor White
 Write-Host ""
 Write-Host "You can now run the standalone script with:" -ForegroundColor Yellow
-Write-Host "  .\Deploy-Windows-Standalone.ps1" -ForegroundColor White
+Write-Host "  .\EZOSD.ps1" -ForegroundColor White
 Write-Host ""

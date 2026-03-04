@@ -172,8 +172,8 @@ function Add-PostInstallScriptFromGitHub {
     }
     
     $contentToAdd = @"
- Start-Transcript -Path 'C:\OSDCloud\Logs\AWNCustomSetupComplete.log' -ErrorAction Ignore
- `$url = '$PostInstallScriptUrl'; `$scriptContent = (Invoke-WebRequest -Uri `$url -UseBasicParsing).Content; Invoke-Expression `$scriptContent.substring(1)
+ Start-Transcript -Path 'C:\EZOSD\Logs\SetupComplete.log' -ErrorAction Ignore
+ `$url = '$PostInstallScriptUrl'; `$scriptContent = (Invoke-RestMethod -Uri `$url); Invoke-Expression `$scriptContent
  Stop-Transcript
 "@
 

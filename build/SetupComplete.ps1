@@ -181,10 +181,10 @@ try {
     Write-Host ""
     
     # Temporarily download the Updates module
-    Invoke-WebRequest -Uri "https://github.com/mattskare/EZOSD/blob/main/src/EZOSD-Updates.psm1" -OutFile $ModulePath
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mattskare/EZOSD/refs/heads/main/src/EZOSD-Updates.psm1" -OutFile $ModulePath
     # We also need the logger
     $LoggerPath = "C:\EZOSD\Modules\EZOSD-Logger.psm1"
-    Invoke-WebRequest -Uri "https://github.com/mattskare/EZOSD/blob/main/src/EZOSD-Logger.psm1" -OutFile $LoggerPath
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mattskare/EZOSD/refs/heads/main/src/EZOSD-Logger.psm1" -OutFile $LoggerPath
 
     # Import EZOSD-Updates module
     Write-Host "[INFO] Importing EZOSD-Updates module..." -ForegroundColor Green

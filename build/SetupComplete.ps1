@@ -49,7 +49,6 @@ function Set-Services {
     )
 
     try {
-        Start-Transcript -Path "C:\Windows\Temp\$($ServiceName)_Management.Log" -Force -ErrorAction SilentlyContinue
         Get-Date
         $service = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
         $service
@@ -64,7 +63,6 @@ function Set-Services {
             }
             Get-Service -Name $ServiceName -ErrorAction SilentlyContinue
         }
-        Stop-Transcript -ErrorAction SilentlyContinue
     }
     catch {
         throw $_
@@ -87,7 +85,6 @@ function Set-SleepSettings {
     )
     
     try {
-        Start-Transcript -Path "C:\Windows\Temp\SleepSettings_$PowerMode.Log" -Force -ErrorAction SilentlyContinue
         Write-Host "Setting power configuration for $PowerMode mode..."
         Write-Host "  Setting GUID: $SettingGuid"
         Write-Host "  Target Value: $SettingValue"
@@ -135,7 +132,6 @@ function Set-SleepSettings {
         }
 
         Write-Host "`nSummary: $successCount succeeded, $failureCount failed"
-        Stop-Transcript -ErrorAction SilentlyContinue
         return ($failureCount -eq 0)
     }
     catch {
@@ -175,12 +171,22 @@ catch {
 }
 #endregion Customizations
 
+#region Windows Updates
+
+
+
 try {
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host " EZOSD Custom Setup Complete - Windows Updates" -ForegroundColor Cyan
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     
+    # Temporarily download the Updates module
+    Invoke-WebRequest -Uri "https://github.com/mattskare/EZOSD/blob/main/src/EZOSD-Updates.psm1" -OutFile $ModulePath
+    # We also need the logger
+    $LoggerPath = "C:\EZOSD\Modules\EZOSD-Logger.psm1"
+    Invoke-WebRequest -Uri "https://github.com/mattskare/EZOSD/blob/main/src/EZOSD-Logger.psm1" -OutFile $LoggerPath
+
     # Import EZOSD-Updates module
     Write-Host "[INFO] Importing EZOSD-Updates module..." -ForegroundColor Green
     if (-not (Test-Path $ModulePath)) {
@@ -344,5 +350,6 @@ finally {
     Write-Host ""
     Write-Host "Transcript saved to: $TranscriptFile" -ForegroundColor Cyan
 }
+#endregion Windows Updates
 
 exit 0

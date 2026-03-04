@@ -13,6 +13,6 @@ echo.
 
 REM Start the deployment script
 echo Starting automated deployment in 5 seconds...
-timeout /t 5
+ping -n 5 localhost > NUL
 powercfg /s 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c > NUL
 PowerShell -ExecutionPolicy Bypass -Command "Invoke-Expression (Invoke-RestMethod -Uri 'https://github.com/mattskare/EZOSD/releases/latest/download/EZOSD.ps1')"

@@ -181,6 +181,10 @@ try {
     Write-Host ""
     
     # Temporarily download the Updates module
+    # Make the folder
+    if (-not (Test-Path "C:\EZOSD\Modules")) {
+        New-Item -Path "C:\EZOSD\Modules" -ItemType Directory -Force | Out-Null
+    }
     Invoke-WebRequest -Uri "https://raw.githubusercontent.com/mattskare/EZOSD/refs/heads/main/src/EZOSD-Updates.psm1" -OutFile $ModulePath
     # We also need the logger
     $LoggerPath = "C:\EZOSD\Modules\EZOSD-Logger.psm1"

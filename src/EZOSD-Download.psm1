@@ -424,7 +424,7 @@ function Remove-DeploymentFiles {
     foreach ($file in $Files) {
         try {
             if (Test-Path $file) {
-                Remove-Item -Path $file -Force
+                Remove-Item -Path $file -Force -Confirm:$false
                 Write-EZOSDLog "Removed temporary file: $file"
             }
             else {

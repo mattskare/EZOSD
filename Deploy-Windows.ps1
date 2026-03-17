@@ -229,7 +229,8 @@ function Start-Deployment {
 
         # Step 7: Cleanup and remove temporary files
         Write-Host "`n[Step 7/7] Finalizing Deployment" -ForegroundColor Yellow
-        $cleanupResult = Remove-DeploymentFiles -TargetDrive $windowsDrive -Files @($esdPath, "$($windowsDrive):\EZOSD\Downloads\Drivers", "$($windowsDrive):\EZOSD\Temp")
+        $cleanupResult = Remove-Item -Path "$($windowsDrive):\EZOSD\Downloads" -Recurse -Force -Confirm:$false
+        #$cleanupResult = Remove-DeploymentFiles -TargetDrive $windowsDrive -Files @($esdPath, "$($windowsDrive):\EZOSD\Downloads\Drivers", "$($windowsDrive):\EZOSD\Temp")
         if ($cleanupResult) {
             Write-Host "  ✓ Temporary files cleaned up" -ForegroundColor Green
         }

@@ -86,7 +86,7 @@ function Start-Deployment {
         }
         
         # Get configuration from cloud
-        $config = Invoke-RestMethod -Uri "https://github.com/mattskare/EZOSD/releases/latest/download/config/deployment.json"
+        $config = Invoke-RestMethod -Uri "https://github.com/mattskare/EZOSD/releases/latest/download/deployment.json"
         
         # Validate required configuration fields
         $requiredFields = @('WindowsVersion', 'Edition', 'TargetDisk', 'PartitionScheme')

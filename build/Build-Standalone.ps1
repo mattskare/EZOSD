@@ -206,7 +206,7 @@ for ($i = 0; $i -lt $lines.Count; $i++) {
 $deployLogic = -join ($lines[$scriptStartIndex..($lines.Count - 1)] | ForEach-Object { "$_`n" })
 
 # Read the version from the version file and inject it into the main script
-$version = (Get-Content .\VERSION -Raw).Trim()
+$version = (Get-Content ..\VERSION -Raw).Trim()
 
 if ($IncludeDebugInfo) {
     $combinedScript += @"

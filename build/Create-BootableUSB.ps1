@@ -191,11 +191,26 @@ function Add-WinPEPackages {
         "WinPE-FMAPI.cab"
     )
     
+    # Determine which packages to install based on user selection
     $packagesToInstall = $requiredPackages
     if ($IncludeOptionalPackages) {
         $packagesToInstall += $optionalPackages
     }
-    
+
+    # Check for already installed packages to avoid redundant installation
+    $packagesAlreadyInstalled = Get-WindowsPackage -Path "$script:WorkingDirectory\WinPE_$Architecture\mount" | Select-Object -ExpandProperty PackageName
+    $alreadyInstalled = $packagesToInstall | Where-Object {
+        $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_)
+        $packagesAlreadyInstalled | Where-Object { $_ -like "$baseName*" }
+    }
+    if ($alreadyInstalled) {
+        Write-Log "Some packages are already installed in the WinPE image. Skipping installation of those packages." -Level Warning
+        $packagesToInstall = $packagesToInstall | Where-Object {
+            $baseName = [System.IO.Path]::GetFileNameWithoutExtension($_)
+            -not ($packagesAlreadyInstalled | Where-Object { $_ -like "$baseName*" })
+        }
+    }
+
     foreach ($package in $packagesToInstall) {
         $packagePath = Join-Path $packagesPath $package
         
@@ -481,11 +496,12 @@ function Start-Build {
         # Create bootable USB
         $finalUSBPath = New-BootableUSB -TargetDiskNumber $DiskNumber -Drive $USBDrive
 
-        if (-not (Test-Path "$script:WorkingDirectory\WinPE_Combined")) {
+        # if (-not (Test-Path "$script:WorkingDirectory\WinPE_Combined")) {
             foreach ($architecture in $architectures) {
                 # Create WinPE working directory
-                New-WinPEWorkingDirectory -ADKPath $ADKPath -Architecture $architecture
-
+                if (-not (Test-Path "$script:WorkingDirectory\WinPE_Combined")) {
+                    New-WinPEWorkingDirectory -ADKPath $ADKPath -Architecture $architecture
+                }
                 # Mount WinPE image
                 Mount-WinPEImage -Architecture $architecture
 
@@ -501,7 +517,7 @@ function Start-Build {
 
             # Create combined EZOSD files in working directory
             Copy-WinPEFilesToCombinedDirectory
-        }
+        # }
 
         # Copy files to USB
         Copy-Item -Path "$script:WorkingDirectory\WinPE_Combined\*" -Destination $finalUSBPath -Recurse -Force

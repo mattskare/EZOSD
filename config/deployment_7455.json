@@ -32,7 +32,7 @@
   ],
   
   "PostInstallScripts": [
-    "X:\\EZOSD\\postInstallScripts\\CustomSetupComplete.ps1"
+    "X:\\EZOSD\\postInstallScripts\\SetupComplete.ps1"
   ],
   
   "_comments": {

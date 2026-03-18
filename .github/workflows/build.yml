@@ -52,6 +52,13 @@ jobs:
           cd build
           .\build.ps1 -OutputPath "..\EZOSD.ps1"
 
+      - name: Create zip archive of USBCreator
+        shell: pwsh
+        run: |
+          $zipName = "EZOSD-USBCreator.zip"
+          Compress-Archive -Path tools/USBCreator/* -DestinationPath $zipName
+          Write-Host "Created archive: $zipName"
+
       - name: Verify output
         shell: pwsh
         run: |
@@ -109,4 +116,4 @@ jobs:
           For detailed documentation, see the [README](https://github.com/${{ github.repository }}/blob/main/README.md).
           "@
 
-          gh release create $tag EZOSD.ps1 postInstallScripts/SetupComplete.ps1 config/*.json --title "Pre-release $tag" --notes $body --prerelease
+          gh release create $tag EZOSD.ps1 postInstallScripts/SetupComplete.ps1 config/*.json EZOSD-USBCreator.zip --title "Pre-release $tag" --notes $body --prerelease

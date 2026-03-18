@@ -81,6 +81,65 @@ jobs:
             Write-Host "Tag $tag does not exist. Ready to create release on merge."
           }
 
+      - name: Check USBCreator version
+        id: usb_check
+        shell: pwsh
+        continue-on-error: true
+        run: |
+          $changedFiles = git diff --name-only origin/main...HEAD
+          $usbChanged = $changedFiles | Where-Object { $_ -like 'tools/USBCreator/*' }
+
+          if (-not $usbChanged) {
+            echo "usb_changed=false" >> $env:GITHUB_OUTPUT
+            echo "usb_result=no_change" >> $env:GITHUB_OUTPUT
+            Write-Host "No USBCreator files changed. Skipping USBCreator version check."
+            exit 0
+          }
+
+          echo "usb_changed=true" >> $env:GITHUB_OUTPUT
+          Write-Host "USBCreator files changed:"
+          $usbChanged | ForEach-Object { Write-Host "  - $_" }
+
+          $prVersion = (Get-Content tools/USBCreator/USBCREATORVERSION -Raw).Trim()
+          $mainVersion = git show origin/main:tools/USBCreator/USBCREATORVERSION 2>$null
+          if ($null -eq $mainVersion) {
+            $mainVersion = "0.0.0"
+          }
+          $mainVersion = $mainVersion.Trim()
+
+          echo "usb_pr_version=$prVersion" >> $env:GITHUB_OUTPUT
+          echo "usb_main_version=$mainVersion" >> $env:GITHUB_OUTPUT
+
+          Write-Host "PR USBCREATORVERSION:   $prVersion"
+          Write-Host "Main USBCREATORVERSION: $mainVersion"
+
+          if ($prVersion -notmatch '^\d+\.\d+\.\d+$') {
+            echo "usb_result=invalid_format" >> $env:GITHUB_OUTPUT
+            Write-Error "USBCREATORVERSION has invalid format '$prVersion'. Expected semantic versioning (e.g. 1.0.0)."
+            exit 1
+          }
+
+          $prParts = $prVersion.Split('.') | ForEach-Object { [int]$_ }
+          $mainParts = $mainVersion.Split('.') | ForEach-Object { [int]$_ }
+          $isIncrement = $false
+          for ($i = 0; $i -lt 3; $i++) {
+            if ($prParts[$i] -gt $mainParts[$i]) {
+              $isIncrement = $true
+              break
+            } elseif ($prParts[$i] -lt $mainParts[$i]) {
+              break
+            }
+          }
+
+          if ($isIncrement) {
+            echo "usb_result=incremented" >> $env:GITHUB_OUTPUT
+            Write-Host "USBCreator version incremented: $mainVersion -> $prVersion"
+          } else {
+            echo "usb_result=not_incremented" >> $env:GITHUB_OUTPUT
+            Write-Error "USBCreator files were changed but USBCREATORVERSION ($prVersion) was not incremented from main ($mainVersion). Please increment USBCREATORVERSION."
+            exit 1
+          }
+
       - name: Update PR comment
         if: always() && steps.check.outcome != 'cancelled'
         uses: actions/github-script@v7
@@ -91,6 +150,11 @@ jobs:
             const prVersion = '${{ steps.check.outputs.pr_version }}';
             const mainVersion = '${{ steps.check.outputs.main_version }}';
             const checkFailed = '${{ steps.check.outcome }}' === 'failure';
+            const usbResult = '${{ steps.usb_check.outputs.usb_result }}';
+            const usbChanged = '${{ steps.usb_check.outputs.usb_changed }}' === 'true';
+            const usbPrVersion = '${{ steps.usb_check.outputs.usb_pr_version }}';
+            const usbMainVersion = '${{ steps.usb_check.outputs.usb_main_version }}';
+            const usbFailed = '${{ steps.usb_check.outcome }}' === 'failure';
 
             let body = marker + '\n\n';
 
@@ -103,6 +167,20 @@ jobs:
             } else {
               body += `### ℹ️ No Release\n\n`;
               body += `\`VERSION\` file (\`${prVersion}\`) has not been incremented from \`main\` (\`${mainVersion}\`). No release will be created on merge.`;
+            }
+
+            if (usbChanged) {
+              body += `\n\n---\n\n`;
+              if (usbFailed && usbResult === 'invalid_format') {
+                body += `### ❌ USBCreator Version Check Failed\n\n`;
+                body += `\`USBCREATORVERSION\` has an invalid format (\`${usbPrVersion}\`). Please use semantic versioning (e.g. \`1.0.0\`).`;
+              } else if (usbFailed && usbResult === 'not_incremented') {
+                body += `### ❌ USBCreator Version Not Incremented\n\n`;
+                body += `Files under \`tools/USBCreator/\` were changed but \`USBCREATORVERSION\` (\`${usbPrVersion}\`) was not incremented from \`main\` (\`${usbMainVersion}\`). Please increment \`USBCREATORVERSION\`.`;
+              } else if (usbResult === 'incremented') {
+                body += `### ✅ USBCreator Version Incremented\n\n`;
+                body += `\`USBCREATORVERSION\` incremented: \`${usbMainVersion}\` → \`${usbPrVersion}\`.`;
+              }
             }
 
             // Find existing bot comment with our marker
@@ -130,10 +208,10 @@ jobs:
             }
 
       - name: Fail if checks failed
-        if: steps.check.outcome == 'failure'
+        if: steps.check.outcome == 'failure' || steps.usb_check.outcome == 'failure'
         shell: pwsh
         run: |
-          Write-Error "Version checks failed. See PR comment for details."
+          Write-Error "One or more version checks failed. See PR comment for details."
           exit 1
 
       - name: Build verification

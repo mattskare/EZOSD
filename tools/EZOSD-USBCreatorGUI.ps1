@@ -3,7 +3,7 @@
     EZOSD USB Creator - Modern WPF GUI for creating bootable USB drives.
 .DESCRIPTION
     A Windows Presentation Foundation (WPF) application that wraps the
-    Create-BootableUSB.ps1 script with a modern dark-themed UI featuring
+    EZOSD-USBCreator.ps1 script with a modern dark-themed UI featuring
     real-time log output, USB drive detection, and progress tracking.
 .NOTES
     Requires: PowerShell 5.1+, .NET Framework 4.5+, Administrator privileges
@@ -21,7 +21,7 @@ Add-Type -AssemblyName System.Windows.Forms
 $script:AppRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $script:RepoRoot = Split-Path -Parent $script:AppRoot
 $script:Version = try { (Get-Content -Path (Join-Path $script:RepoRoot "VERSION") -Raw).Trim() } catch { "0.0.0" }
-$script:BuildScriptPath = Join-Path $script:RepoRoot "build\Create-BootableUSB.ps1"
+$script:BuildScriptPath = Join-Path $script:RepoRoot "tools\EZOSD-USBCreator.ps1"
 $script:RunningJob = $null
 $script:RunspacePool = $null
 $script:LogTimer = $null

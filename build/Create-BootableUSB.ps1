@@ -374,12 +374,11 @@ function Update-BootConfiguration {
     # Set environment variable for bcdedit to use the BCD store in the combined directory
     $env:USBDrive = $USBDrive
 
-    $cmdLine = "/c .\build\SetBootConfig.cmd"
-    Write-Verbose "Running: cmd.exe $cmdLine"
+    Write-Verbose "Running: cmd.exe /c .\build\SetBootConfig.cmd"
 
-    $process = Start-Process -FilePath "cmd.exe" -ArgumentList $cmdLine -Wait -PassThru -NoNewWindow
-    if ($process.ExitCode -ne 0) {
-        throw "Failed to update boot configuration (Exit code: $($process.ExitCode))"
+    & cmd.exe /c ".\build\SetBootConfig.cmd" 2>&1 | ForEach-Object { $_ }
+    if ($LASTEXITCODE -ne 0) {
+        throw "Failed to update boot configuration (Exit code: $LASTEXITCODE)"
     }
 
     # Clean up

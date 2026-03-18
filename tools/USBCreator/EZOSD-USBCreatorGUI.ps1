@@ -19,9 +19,8 @@ Add-Type -AssemblyName System.Windows.Forms
 
 # ─── Script Variables ──────────────────────────────────────────────────────────
 $script:AppRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
-$script:RepoRoot = Split-Path -Parent $script:AppRoot
-$script:Version = try { (Get-Content -Path (Join-Path $script:RepoRoot "VERSION") -Raw).Trim() } catch { "0.0.0" }
-$script:BuildScriptPath = Join-Path $script:RepoRoot "tools\EZOSD-USBCreator.ps1"
+$script:Version = try { (Get-Content -Path (Join-Path $script:AppRoot "VERSION") -Raw).Trim() } catch { "0.0.0" }
+$script:BuildScriptPath = Join-Path $script:AppRoot "EZOSD-USBCreator.ps1"
 $script:RunningJob = $null
 $script:RunspacePool = $null
 $script:LogTimer = $null
@@ -972,7 +971,7 @@ $controls['StartBtn'].Add_Click({
         Window       = $window
         Controls     = $controls
         ScriptPath   = $script:BuildScriptPath
-        RepoRoot     = $script:RepoRoot
+        AppRoot      = $script:AppRoot
         DiskNumber   = $diskNumber
         ADKPath      = $adkPath
         WorkDir      = $workDir
@@ -1033,7 +1032,7 @@ $controls['StartBtn'].Add_Click({
             if ($sync.ADKPath) { $params['ADKPath'] = $sync.ADKPath }
             if ($sync.IncludeOpt) { $params['IncludeOptionalPackages'] = $true }
 
-            Set-Location $sync.RepoRoot
+            Set-Location $sync.AppRoot
 
             # Stream output line-by-line as produced (not buffered into a variable).
             # Each item is classified and enqueued; the UI drain timer renders batches.

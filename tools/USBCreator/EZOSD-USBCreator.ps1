@@ -44,7 +44,7 @@ param(
 $ErrorActionPreference = "Stop"
 
 # Read version from file
-$version = (Get-Content -Path (Join-Path "$PSScriptRoot\.." "VERSION") -Raw).Trim()
+$version = (Get-Content -Path (Join-Path "$PSScriptRoot" "VERSION") -Raw).Trim()
 
 # Script variables
 $script:WorkingDirectory = Join-Path $Directory "EZOSD_USB_Build"
@@ -251,7 +251,7 @@ function New-StartNetCmd {
     
     $startNetPath = Join-Path "$script:WorkingDirectory\WinPE_$Architecture\mount" "Windows\System32\startnet.cmd"
     
-    $startNetContent = Get-Content -Path (Join-Path $script:EZOSDRoot "build\startnet_template.cmd") -Raw
+    $startNetContent = Get-Content -Path (Join-Path $PSScriptRoot "startnet_template.cmd") -Raw
     $startNetContent = $startNetContent -replace '__EZOSD_VERSION__', $version
     $startNetContent | Out-File -FilePath $startNetPath -Encoding ASCII -Force
     
@@ -373,9 +373,9 @@ function Update-BootConfiguration {
     # Set environment variable for bcdedit to use the BCD store in the combined directory
     $env:USBDrive = $USBDrive
 
-    Write-Verbose "Running: cmd.exe /c .\build\SetBootConfig.cmd"
+    Write-Verbose "Running: cmd.exe /c .\SetBootConfig.cmd"
 
-    & cmd.exe /c ".\build\SetBootConfig.cmd" 2>&1 | ForEach-Object { $_ }
+    & cmd.exe /c ".\SetBootConfig.cmd" 2>&1 | ForEach-Object { $_ }
     if ($LASTEXITCODE -ne 0) {
         throw "Failed to update boot configuration (Exit code: $LASTEXITCODE)"
     }
@@ -551,6 +551,21 @@ function Start-Build {
         Write-Host ""
         
         return $false
+    }
+    finally {
+        # Dismount any mounted images in case of failure
+        foreach ($architecture in @('amd64', 'arm64')) {
+            $mountPath = "$script:WorkingDirectory\WinPE_$architecture\mount"
+            if (Test-Path "$mountPath\*" -PathType Leaf) {
+                try {
+                    Dismount-WindowsImage -Path $mountPath -Discard -ErrorAction Stop
+                    Write-Log "Unmounted $architecture image during cleanup" -Level Warning
+                }
+                catch {
+                    Write-Log "Failed to unmount $architecture image during cleanup: $_" -Level Warning
+                }
+            }
+        }
     }
 }
 

@@ -18,7 +18,7 @@
     .\Deploy-Windows.ps1
     Run with default settings and configuration.
 .NOTES
-    Version: 0.2.2
+    Version: See VERSION file
     Requires: WinPE environment, PowerShell 5.1+, DISM module
 #>
 
@@ -44,6 +44,7 @@ $ErrorActionPreference = "Stop"
 # Import modules
 $scriptRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 $modulePath = Join-Path $scriptRoot "src"
+$version = (Get-Content -Path (Join-Path $scriptRoot "VERSION") -Raw).Trim()
 
 Import-Module (Join-Path $modulePath "EZOSD-Logger.psm1") -Force
 Import-Module (Join-Path $modulePath "EZOSD-Core.psm1") -Force

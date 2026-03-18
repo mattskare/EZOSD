@@ -16,7 +16,7 @@
     .\Create-BootableUSB.ps1 -USBDrive E:
     Create bootable USB on drive E: with default settings.
 .NOTES
-    Version: 0.2.2
+    Version: See VERSION file
     Requires: Administrator privileges, Windows ADK
 #>
 
@@ -253,7 +253,7 @@ function New-StartNetCmd {
     $startNetPath = Join-Path "$script:WorkingDirectory\WinPE_$Architecture\mount" "Windows\System32\startnet.cmd"
     
     $startNetContent = Get-Content -Path (Join-Path $script:EZOSDRoot "build\startnet_template.cmd") -Raw
-    
+    $startNetContent = $startNetContent -replace '__EZOSD_VERSION__', $version
     $startNetContent | Out-File -FilePath $startNetPath -Encoding ASCII -Force
     
     Write-Log "startnet.cmd created" -Level Success

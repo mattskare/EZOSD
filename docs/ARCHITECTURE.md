@@ -371,8 +371,3 @@ Future support for:
 - **Post-Install Scripts**: `postInstallScripts/*.ps1`
 - **Documentation**: `docs/*.md`
 - **Build**: `build/*.ps1`
-
----
-
-**Version**: 0.2.2
-**Last Updated**: March 2026

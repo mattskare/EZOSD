@@ -31,9 +31,7 @@
     }
   ],
   
-  "PostInstallScripts": [
-    "X:\\EZOSD\\postInstallScripts\\SetupComplete.ps1"
-  ],
+  "PostInstallScript": "https://github.com/mattskare/EZOSD/releases/latest/download/SetupComplete.ps1",
   
   "_comments": {
     "WindowsVersion": "10 or 11",
@@ -44,7 +42,7 @@
     "ESDPath": "Local path to Windows ESD/WIM file (takes precedence over download)",
     "ESDDownloadURL": "Direct download URL for Windows ESD (if not using local path)",
     "DriverSources": "Array of driver sources to download and inject during deployment",
-    "PostInstallScripts": "Array of script paths to execute after Windows installation",
+    "PostInstallScript": "Script path to execute after Windows installation",
     "Note": "Remove or disable example driver sources before deployment"
   }
 }

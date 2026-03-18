@@ -124,4 +124,4 @@ jobs:
           For detailed documentation, see the [README](https://github.com/${{ github.repository }}/blob/main/README.md).
           "@
 
-          gh release create $tag EZOSD.ps1 build/SetupComplete.ps1 config/*.json --title "Pre-release $tag" --notes $body --prerelease
+          gh release create $tag EZOSD.ps1 postInstallScripts/SetupComplete.ps1 config/*.json --title "Pre-release $tag" --notes $body --prerelease
